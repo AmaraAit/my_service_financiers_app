@@ -6,6 +6,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import com.example.demo.entity.Client;
 
 @RepositoryRestResource
-public interface UserRepository extends JpaRepository<Client, String>{
+public interface ClientRepository extends JpaRepository<Client, Long>{
 
 }

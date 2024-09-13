@@ -8,8 +8,8 @@ public interface IUserService {
 	
 	Client saveUser(Client client);
 	List<Client> getUsers();
-	Client getUserByUserId(String userId);
-	Client updateUser(String userId,Client client);
-	void deleteUser(String userId);
+	Client getUserByUserId(long userId);
+	Client updateUser(long userId,Client client);
+	void deleteUser(long userId);
 
 }
