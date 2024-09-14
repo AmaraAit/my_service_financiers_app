@@ -2,6 +2,6 @@ package com.example.demo.enumerate;
 
 public enum NotificationType {
 	
-	TRANSACTION, LOAN_APPROVAT, SECURITY_ALERT
+	TRANSACTION, LOAN_APPROVAT, SECURITY_ALERT,EMAIL,SMS,PUSH
 
 }
