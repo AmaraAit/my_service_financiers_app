@@ -55,7 +55,7 @@ public class AccountController {
 	@GetMapping("/{id}")
 	public Account geAccountbyid(@PathVariable long id) {
 		Account account=accountService.getAccountsById(id);
-			account.setUserDto(clientRest.getUserById(id));
+			account.setUserDto(clientRest.getUserById(account.getUserId()));
 		
 		return account;
 	}

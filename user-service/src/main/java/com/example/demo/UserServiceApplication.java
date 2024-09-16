@@ -37,7 +37,7 @@ public class UserServiceApplication {
 			clientRepository.save(client1);
 			
 			Client client2 = new Client();
-			client2.setId(2);
+			//client2.setId(2);
 			client2.setFirstName("Jane");
 			client2.setLastName("Smith");
 			client2.setPhoneNumber(9876543210L);
@@ -49,7 +49,7 @@ public class UserServiceApplication {
 			clientRepository.save(client2);
 
 			Client client3 = new Client();
-			client3.setId(3);
+			//client3.setId(3);
 			client3.setFirstName("Alice");
 			client3.setLastName("Johnson");
 			client3.setPhoneNumber(1112223333L);
@@ -61,7 +61,7 @@ public class UserServiceApplication {
 			clientRepository.save(client3);
 
 			Client client4 = new Client();
-			client4.setId(4);
+			//client4.setId(4);
 			client4.setFirstName("Bob");
 			client4.setLastName("Williams");
 			client4.setPhoneNumber(4445556666L);
@@ -73,7 +73,7 @@ public class UserServiceApplication {
 			clientRepository.save(client4);
 
 			Client client5 = new Client();
-			client5.setId(5);
+			//client5.setId(5);
 			client5.setFirstName("Charlie");
 			client5.setLastName("Brown");
 			client5.setPhoneNumber(7778889999L);
@@ -85,7 +85,7 @@ public class UserServiceApplication {
 			clientRepository.save(client5);
 
 			Client client6 = new Client();
-			client6.setId(6);
+			//client6.setId(6);
 			client6.setFirstName("David");
 			client6.setLastName("Miller");
 			client6.setPhoneNumber(1010101010L);
@@ -97,7 +97,7 @@ public class UserServiceApplication {
 			clientRepository.save(client6);
 
 			Client client7 = new Client();
-			client7.setId(7);
+			//client7.setId(7);
 			client7.setFirstName("Eva");
 			client7.setLastName("Martinez");
 			client7.setPhoneNumber(1212121212L);
@@ -109,7 +109,7 @@ public class UserServiceApplication {
 			clientRepository.save(client7);
 
 			Client client8 = new Client();
-			client8.setId(8);
+			//client8.setId(8);
 			client8.setFirstName("Frank");
 			client8.setLastName("Garcia");
 			client8.setPhoneNumber(1313131313L);
@@ -121,7 +121,7 @@ public class UserServiceApplication {
 			clientRepository.save(client8);
 
 			Client client9 = new Client();
-			client9.setId(9);
+			//client9.setId(9);
 			client9.setFirstName("Grace");
 			client9.setLastName("Hernandez");
 			client9.setPhoneNumber(1414141414L);
@@ -133,7 +133,7 @@ public class UserServiceApplication {
 			clientRepository.save(client9);
 
 			Client client10 = new Client();
-			client10.setId(10);
+			//client10.setId(10);
 			client10.setFirstName("Hank");
 			client10.setLastName("Lopez");
 			client10.setPhoneNumber(1515151515L);
