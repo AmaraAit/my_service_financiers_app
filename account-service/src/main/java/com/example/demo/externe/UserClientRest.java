@@ -11,22 +11,22 @@ import com.example.demo.dto.UserDto;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
-@FeignClient(name = "user-service", url = "http://localhost:8888/USER-SERVICE")
+@FeignClient(name = "USER-SERVICE")
 @RefreshScope
 public interface UserClientRest {
 	
 	@GetMapping("/{id}")
-	@CircuitBreaker(name = "user-service",fallbackMethod = "getDefaultUser")
+	@CircuitBreaker(name = "USER-SERVICE",fallbackMethod = "getDefaultUser")
     UserDto getUserById(@PathVariable long id);
 	
-	  default UserDto  getDefaultUser() {
+	 static UserDto  getDefaultUser(int id,Exception exception) {
 		UserDto userDto=new UserDto();
 		userDto.setFirstName("Not Available");
 		userDto.setLastName("Not Available");
 		userDto.setAdresse("Not Available");
 		userDto.setEmail("Not Available");
 		userDto.setPhoneNumber(0);
-		userDto.setId(0);
+		userDto.setId(id);
 		userDto.setEnabled(false);
 		
 		return userDto;
