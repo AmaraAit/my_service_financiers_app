@@ -38,15 +38,15 @@ public class TransactionController {
 		return repository.findAll();
 	}
 	@GetMapping("/{id}")
-	public ResponseEntity<TransactionDto> getTransactionById(@PathVariable long id){
+	public TransactionDto getTransactionById(@PathVariable long id){
 		TransactionDto dto=iTransactionService.getTransactionById(id);
-		return ResponseEntity.ok(dto);
+		return dto;
 	}
 	
 	@GetMapping("/account/{accountId}")
-	public ResponseEntity<List<TransactionDto>> getTransactionForAccount(@PathVariable long accountId){
+	public List<TransactionDto> getTransactionForAccount(@PathVariable long accountId){
 		List<TransactionDto> transactions=iTransactionService.getTransactionsForAccount(accountId);
-		return ResponseEntity.ok(transactions);
+		return transactions;
 	}
 	
 }

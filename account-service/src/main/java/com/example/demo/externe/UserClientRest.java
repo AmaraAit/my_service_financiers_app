@@ -19,7 +19,7 @@ public interface UserClientRest {
 	@CircuitBreaker(name = "USER-SERVICE",fallbackMethod = "getDefaultUser")
     UserDto getUserById(@PathVariable long id);
 	
-	 static UserDto  getDefaultUser(int id,Exception exception) {
+	default UserDto  getDefaultUser(long id,Exception exception) {
 		UserDto userDto=new UserDto();
 		userDto.setFirstName("Not Available");
 		userDto.setLastName("Not Available");

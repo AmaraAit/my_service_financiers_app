@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,11 +18,13 @@ import com.example.demo.externe.AccountFeignClient;
 import com.example.demo.repository.TransactionRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class TransactionServiceImpl implements ITransactionService{
 	
-	TransactionRepository transactionRepository;
+	private TransactionRepository transactionRepository;
 	private AccountFeignClient accountFeignClient;
 	@Override
 	@Transactional
@@ -60,7 +63,11 @@ public class TransactionServiceImpl implements ITransactionService{
 	@Override
 	public List<TransactionDto> getTransactionsForAccount(long accountId) {
 		List<Transaction> transactions=transactionRepository.findBySourceAccountIdOrdestinationAccountId(accountId, accountId);
-		return transactions.stream().map(this::convertToDto).collect(Collectors.toList());
+		List<TransactionDto> transactionsdto=new ArrayList<>();
+		for (Transaction transaction : transactions) {
+			transactionsdto.add(convertToDto(transaction));
+		}
+		return transactionsdto;
 	}
 	private TransactionDto convertToDto(Transaction transaction) {
 		TransactionDto transactionDto=new TransactionDto();
