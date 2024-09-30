@@ -52,7 +52,8 @@ public class TransactionServiceImpl implements ITransactionService{
 
 	@Override
 	public TransactionDto getTransactionById(long id) {
-		Transaction transaction=transactionRepository.findById(id).orElseThrow(()->new RuntimeException("Transaction not found"));
+		Transaction transaction=transactionRepository.findById(id).orElseThrow();
+		System.out.println(transaction);
 		return convertToDto(transaction);
 	}
 

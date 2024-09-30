@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.CreateTransactionRequestDto;
 import com.example.demo.dto.TransactionDto;
 import com.example.demo.dto.TransactionResponseDto;
+import com.example.demo.entity.Transaction;
+import com.example.demo.repository.TransactionRepository;
 import com.example.demo.service.ITransactionService;
 
 import lombok.AllArgsConstructor;
@@ -21,7 +23,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("/transactions")
 public class TransactionController {
-	
+	TransactionRepository repository;
 	ITransactionService iTransactionService;
 	
 	@PostMapping
@@ -30,7 +32,11 @@ public class TransactionController {
 		return ResponseEntity.ok(responseDto);
 		
 	}
-	
+	@GetMapping
+	public List<Transaction> getTransactions(){
+		
+		return repository.findAll();
+	}
 	@GetMapping("/{id}")
 	public ResponseEntity<TransactionDto> getTransactionById(@PathVariable long id){
 		TransactionDto dto=iTransactionService.getTransactionById(id);
