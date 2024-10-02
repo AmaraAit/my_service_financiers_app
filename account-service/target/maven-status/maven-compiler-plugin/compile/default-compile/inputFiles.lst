@@ -1,0 +1,10 @@
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\AccountServiceApplication.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\dto\AccountDto.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\dto\CreateAccountRequestDto.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\dto\UserDto.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\entity\Account.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\externe\UserClientRest.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\repository\AccountRepository.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\service\AccountServiceImpl.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\service\IAccountService.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\web\AccountController.java

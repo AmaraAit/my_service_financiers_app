@@ -1,0 +1,11 @@
+com\example\demo\service\LoanServiceImpl.class
+com\example\demo\entity\LoanPayment.class
+com\example\demo\entity\Loan$LoanBuilder.class
+com\example\demo\enumerate\PaymentStatus.class
+com\example\demo\entity\Loan.class
+com\example\demo\repository\LoanRepository.class
+com\example\demo\service\ILoanService.class
+com\example\demo\web\LoanController.class
+com\example\demo\enumerate\LoanStatus.class
+com\example\demo\LoanServiceApplication.class
+com\example\demo\entity\LoanPayment$LoanPaymentBuilder.class
