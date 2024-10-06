@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,10 +30,10 @@ public class Loan {
 	private BigDecimal principalAmount;
 	private BigDecimal interestRate;
 	private int durationInMonths;
-	
+	private BigDecimal amount;
 	private LocalDateTime loanStartDate;
 	private LocalDateTime loanEndDate;
-	
+	private BigDecimal outstandingBalance;
 	private long userId;
 	
 	@Enumerated(EnumType.STRING)

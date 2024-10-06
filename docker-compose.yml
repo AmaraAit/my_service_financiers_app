@@ -1,4 +1,15 @@
 services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Amara?01
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+        
   discovery-service:
     build: ./discovery-service
     container_name: discovery-service
@@ -34,15 +45,18 @@ services:
     expose:
       - '8081'
     environment:
-      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka/
       - CONFIG_SERVICE_URL=http://config-service:9911
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/my_users
+      
+      
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
       interval: 10s
       retries: 4
     depends_on:
-      config-service:
-        condition: service_healthy
+     config-service:
+       condition: service_healthy
   account-service:
     build: ./account-service
     container_name: account-service
@@ -53,6 +67,7 @@ services:
     environment:
       - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
       - CONFIG_SERVICE_URL=http://config-service:9911
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/my_accounts
     depends_on:
       user-service:
         condition: service_healthy
@@ -108,4 +123,7 @@ services:
     depends_on:
       config-service:
         condition: service_healthy
+   
+        
+    
  
