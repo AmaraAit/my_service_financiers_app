@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Client;
+import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.repository.ClientRepository;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements IUserService{
 	@Override
 	public Client getUserByUserId(long userId) {
 		
-		return clientRepository.findById(userId).get();
+		return clientRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User Not Found"));
 	}
 
 	@Override

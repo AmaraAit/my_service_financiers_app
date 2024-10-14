@@ -25,7 +25,7 @@ public class LoanServiceImpl implements ILoanService{
                 .durationInMonths(loanDTO.getDurationInMonths())
                 .loanStartDate(loanDTO.getLoanStartDate())
                 .loanEndDate(loanDTO.getLoanEndDate())
-                .outstandingBalance(loanDTO.getAmount())
+                .outstandingBalance(loanDTO.getOutstandingBalance())
                 .status(LoanStatus.PENDING)
                 .build();
 

@@ -14,6 +14,7 @@ import com.example.demo.dto.TransactionResponseDto;
 import com.example.demo.entity.Transaction;
 import com.example.demo.enumerate.TransactionStatus;
 import com.example.demo.enumerate.TransactionType;
+import com.example.demo.exception.TransactionNotFoundException;
 import com.example.demo.externe.AccountFeignClient;
 import com.example.demo.repository.TransactionRepository;
 
@@ -55,8 +56,8 @@ public class TransactionServiceImpl implements ITransactionService{
 
 	@Override
 	public TransactionDto getTransactionById(long id) {
-		Transaction transaction=transactionRepository.findById(id).orElseThrow();
-		System.out.println(transaction);
+		Transaction transaction=transactionRepository.findById(id).orElseThrow(()->new TransactionNotFoundException("Transaction Not Found"));
+		
 		return convertToDto(transaction);
 	}
 
