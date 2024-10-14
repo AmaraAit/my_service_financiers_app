@@ -29,18 +29,19 @@ public interface AccountFeignClient {
 	
 	@GetMapping("/accounts/{id}")
 	@CircuitBreaker(name = "ACCOUNT-SERVICE",fallbackMethod = "getDefaultAccount")
-	public AccountDTO geAccountbyid(@PathVariable long id);
-	default BigDecimal getDefaultBalance(long id) {
+    AccountDTO geAccountbyid(@PathVariable long id);
+	
+	default BigDecimal getDefaultBalance(long id,Exception exception) {
 		
 		return new BigDecimal(0);
 		
 	}
-	default String getDefaultInfo(long id) {
+	default String getDefaultInfo(long id,Exception exception) {
 		
 		return "Opération Echoué";
 		
 	}
-	default AccountDTO getDefaultAccount(long id) {
+	default AccountDTO getDefaultAccount(long id,Exception exception) {
 		AccountDTO accountDTO=AccountDTO.builder()
 				.accountId(id)
 				.accountNumber("Not Available")
