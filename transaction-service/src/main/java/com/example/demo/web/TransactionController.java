@@ -14,6 +14,7 @@ import com.example.demo.dto.CreateTransactionRequestDto;
 import com.example.demo.dto.TransactionDto;
 import com.example.demo.dto.TransactionResponseDto;
 import com.example.demo.entity.Transaction;
+import com.example.demo.externe.AccountFeignClient;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.service.ITransactionService;
 
@@ -25,6 +26,7 @@ import lombok.AllArgsConstructor;
 public class TransactionController {
 	TransactionRepository repository;
 	ITransactionService iTransactionService;
+	AccountFeignClient accountFeignClient;
 	
 	@PostMapping
 	public ResponseEntity<TransactionResponseDto> createTransaction(@RequestBody CreateTransactionRequestDto requestDto){
@@ -40,6 +42,8 @@ public class TransactionController {
 	@GetMapping("/{id}")
 	public TransactionDto getTransactionById(@PathVariable long id){
 		TransactionDto dto=iTransactionService.getTransactionById(id);
+				dto.setSourceAccountdto(accountFeignClient.geAccountbyid(dto.getSourceAccountId()));
+				dto.setDestinationAccountdto(accountFeignClient.geAccountbyid(dto.getDestinationAccountId()));
 		return dto;
 	}
 	

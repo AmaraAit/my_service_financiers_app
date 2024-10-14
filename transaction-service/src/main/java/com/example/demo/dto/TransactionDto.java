@@ -8,6 +8,7 @@ import com.example.demo.enumerate.TransactionType;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Transient;
 import lombok.Data;
 @Data
 public class TransactionDto {
@@ -22,8 +23,11 @@ public class TransactionDto {
 	
 	
 	private long sourceAccountId;
-	
+	@Transient
+	private AccountDTO sourceAccountdto;
 	private long destinationAccountId;
+	@Transient
+	private AccountDTO destinationAccountdto;
 	@Enumerated(EnumType.STRING)
 	private TransactionStatus status;
 }

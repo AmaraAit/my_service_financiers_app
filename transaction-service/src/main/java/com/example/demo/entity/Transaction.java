@@ -3,7 +3,7 @@ package com.example.demo.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
+import com.example.demo.dto.AccountDTO;
 import com.example.demo.enumerate.TransactionStatus;
 import com.example.demo.enumerate.TransactionType;
 
@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +36,7 @@ public class Transaction {
 	private long sourceAccountId;
 	
 	private long destinationAccountId;
+	
 	@Enumerated(EnumType.STRING)
 	private TransactionStatus status;
 	

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.AccountDto;
 import com.example.demo.dto.CreateAccountRequestDto;
 import com.example.demo.entity.Account;
+import com.example.demo.exception.AccountNotFoundException;
 import com.example.demo.repository.AccountRepository;
 
 import jakarta.transaction.Transactional;
@@ -29,7 +30,7 @@ public class AccountServiceImpl implements IAccountService{
 	@Override
 	public Account getAccountsById(long id) {
 		
-		return accountRepository.findById(id).get();
+		return accountRepository.findById(id).orElseThrow(()->new AccountNotFoundException("Account Not Found"));
 	}
 	@Override
 	public AccountDto createAccountDto(CreateAccountRequestDto accountRequestDto) {
@@ -52,12 +53,12 @@ public class AccountServiceImpl implements IAccountService{
 	@Override
 	public BigDecimal getAccountBalance(long id) {
 		
-		return accountRepository.findById(id).orElseThrow(()->new RuntimeException("Account not found")).getBalance();
+		return accountRepository.findById(id).orElseThrow(()->new AccountNotFoundException("Account not found")).getBalance();
 	}
 	@Override
 	@Transactional
 	public void debitAccount(long id, BigDecimal amount) throws InsufficientResourcesException {
-		Account account=accountRepository.findById(id).orElseThrow(()->new RuntimeException("Account Not Found"));
+		Account account=accountRepository.findById(id).orElseThrow(()->new AccountNotFoundException("Account Not Found"));
 		if(account.getBalance().compareTo(amount)<0) {
 			throw new InsufficientResourcesException("Votre credit est insuffisant pour effectué cette transaction");
 		}
