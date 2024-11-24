@@ -16,6 +16,7 @@ import com.example.demo.enumerate.TransactionStatus;
 import com.example.demo.enumerate.TransactionType;
 import com.example.demo.exception.TransactionNotFoundException;
 import com.example.demo.externe.AccountFeignClient;
+import com.example.demo.kafka.KafkaProducerService;
 import com.example.demo.repository.TransactionRepository;
 
 import jakarta.transaction.Transactional;
@@ -27,6 +28,7 @@ public class TransactionServiceImpl implements ITransactionService{
 	
 	private TransactionRepository transactionRepository;
 	private AccountFeignClient accountFeignClient;
+	private KafkaProducerService kafkaProducerService;
 	@Override
 	@Transactional
 	public TransactionResponseDto createTransaction(CreateTransactionRequestDto transactionRequestDto) {
@@ -50,6 +52,7 @@ public class TransactionServiceImpl implements ITransactionService{
 					accountFeignClient.creditAccount(transactionRequestDto.getDestinationAccountId(), transactionRequestDto.getAmount());
 				}
 				transaction.setStatus(TransactionStatus.COMPLETED);
+				kafkaProducerService.sendmsg(transaction.getType().toString());
 				transactionRepository.save(transaction);
 		return new TransactionResponseDto(transaction.getTransactionId(),TransactionStatus.COMPLETED,"Transaction est terminée avec succées ");
 	}

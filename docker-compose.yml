@@ -45,7 +45,7 @@ services:
       POSTGRES_PASSWORD: transactiondbpassword
       POSTGRES_DB: transactiondb
     ports:
-      - "5435:5432"
+      - "5437:5432"
     volumes:
       - transaction-db-data:/var/lib/postgresql/data
 
@@ -60,7 +60,54 @@ services:
       - "5436:5432"
     volumes:
       - notification-db-data:/var/lib/postgresql/data
+  
+  my-discovery-service:
+    build: ./discovery-service
+    container_name: my-discovery-service
+    ports:
+      - '8761:8761'
+    expose:
+      - '8761'
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      retries: 4
+      
+  my-config-service:
+    build: ./config-service
+    container_name: my-config-service
+    ports:
+      - '9911:9911'
+    expose:
+      - '9911'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9911/actuator/health" ]
+      interval: 10s
+      retries: 4
+    depends_on:
+      my-discovery-service:
+        condition: service_healthy
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
 
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   # User Service
   user-service:
     build: ./user-service
@@ -69,7 +116,8 @@ services:
       SPRING_DATASOURCE_USERNAME: userdbuser
       SPRING_DATASOURCE_PASSWORD: userdbpassword
     depends_on:
-      - postgres-user-db
+      my-config-service:
+        condition: service_healthy
     ports:
       - "8081:8081"
 
@@ -81,7 +129,8 @@ services:
       SPRING_DATASOURCE_USERNAME: accountdbuser
       SPRING_DATASOURCE_PASSWORD: accountdbpassword
     depends_on:
-      - postgres-account-db
+      my-config-service:
+        condition: service_healthy
     ports:
       - "8082:8082"
 
@@ -93,7 +142,8 @@ services:
       SPRING_DATASOURCE_USERNAME: loandbuser
       SPRING_DATASOURCE_PASSWORD: loandbpassword
     depends_on:
-      - postgres-loan-db
+      my-config-service:
+        condition: service_healthy
     ports:
       - "8083:8083"
 
@@ -105,7 +155,8 @@ services:
       SPRING_DATASOURCE_USERNAME: transactiondbuser
       SPRING_DATASOURCE_PASSWORD: transactiondbpassword
     depends_on:
-      - postgres-transaction-db
+      my-config-service:
+        condition: service_healthy
     ports:
       - "8084:8084"
 
@@ -117,9 +168,19 @@ services:
       SPRING_DATASOURCE_USERNAME: notificationdbuser
       SPRING_DATASOURCE_PASSWORD: notificationdbpassword
     depends_on:
-      - postgres-notification-db
+      my-config-service:
+        condition: service_healthy
     ports:
       - "8085:8085"
+  
+  gateway-service:
+    build: ./gateway-service
+    
+    depends_on:
+      my-config-service:
+        condition: service_healthy
+    ports:
+      - "8888:8888" 
 
 # Définir les volumes à l'extérieur de la section "services"
 volumes:
@@ -128,3 +189,4 @@ volumes:
   loan-db-data:
   transaction-db-data:
   notification-db-data:
+  

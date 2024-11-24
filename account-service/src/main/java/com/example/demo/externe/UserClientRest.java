@@ -15,7 +15,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 @RefreshScope
 public interface UserClientRest {
 	
-	@GetMapping("/{id}")
+	@GetMapping("/users/{id}")
 	@CircuitBreaker(name = "USER-SERVICE",fallbackMethod = "getDefaultUser")
     UserDto getUserById(@PathVariable long id);
 	

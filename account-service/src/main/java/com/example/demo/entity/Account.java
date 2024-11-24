@@ -35,11 +35,11 @@ public class Account {
 	@Transient
 	private UserDto userDto;
 	
-	public void deposit(BigDecimal amount) {
+	public void crediter(BigDecimal amount) {
 		this.balance = this.balance.add(amount);
 	}
 	
-	public void withdraw(BigDecimal amount){
+	public void debiter(BigDecimal amount){
 		if(this.balance.compareTo(amount)>=0) {
 			this.balance=this.balance.subtract(amount);
 		}
