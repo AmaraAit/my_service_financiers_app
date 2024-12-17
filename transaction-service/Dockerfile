@@ -1,4 +1,4 @@
 FROM openjdk:17-oracle
-VOLUME /tmp
-COPY target/*jar app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+WORKDIR /app
+COPY target/*.jar /app/transaction-service.jar
+ENTRYPOINT ["java","-jar","transaction-service.jar"]

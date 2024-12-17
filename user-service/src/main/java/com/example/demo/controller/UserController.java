@@ -36,9 +36,8 @@ public class UserController {
 		 
 	 }
 	 @GetMapping
-	 public List<Client> getUsers() {
+	 public List<Client> getUsers(){
 		return iUserService.getUsers();
-		 
 	 }
 	 @PutMapping("/update/{id}")
 	 public Client updateUser(@PathVariable long id,@RequestBody Client client) {

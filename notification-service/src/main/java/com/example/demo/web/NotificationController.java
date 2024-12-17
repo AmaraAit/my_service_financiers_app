@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.NotificationRequestDto;
 import com.example.demo.dto.NotificationResponseDto;
 import com.example.demo.enumerate.NotificationType;
+import com.example.demo.kafka.KafkaConsumerService;
 import com.example.demo.service.INotificationService;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import lombok.AllArgsConstructor;
 public class NotificationController {
 	
 	INotificationService iNotificationService;
+	KafkaConsumerService consumerService;
 	
 	@GetMapping("/send")
 	public ResponseEntity<String> sendNotification( ) {
@@ -38,6 +40,13 @@ public class NotificationController {
 	        List<NotificationResponseDto> notificationResponseDtos= iNotificationService.getNotificationsForUser(userid);
 	        return ResponseEntity.ok(notificationResponseDtos);
 	    }
+	
+	 @GetMapping("/messages")
+	    public String getMessages() {
+	        return consumerService.getMessages();
+	    }
+    
+    
 	
 
 }

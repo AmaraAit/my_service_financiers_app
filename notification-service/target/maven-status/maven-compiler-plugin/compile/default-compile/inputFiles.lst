@@ -4,6 +4,8 @@ C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\entity\Notification.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\enumerate\NotificationType.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\enumerate\UserRole.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\kafka\KafkaConsumerConfig.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\kafka\KafkaConsumerService.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\NotificationServiceApplication.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\repository\NotificationRepository.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\notification-service\src\main\java\com\example\demo\service\INotificationService.java

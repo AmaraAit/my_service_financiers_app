@@ -3,7 +3,9 @@ com\example\demo\web\AccountController.class
 com\example\demo\service\IAccountService.class
 com\example\demo\dto\CreateAccountRequestDto$CreateAccountRequestDtoBuilder.class
 com\example\demo\dto\CreateAccountRequestDto.class
+com\example\demo\exception\GlobalHandlerException.class
 com\example\demo\dto\UserDto.class
+com\example\demo\exception\AccountNotFoundException.class
 com\example\demo\repository\AccountRepository.class
 com\example\demo\service\AccountServiceImpl.class
 com\example\demo\dto\UserDto$UserDtoBuilder.class

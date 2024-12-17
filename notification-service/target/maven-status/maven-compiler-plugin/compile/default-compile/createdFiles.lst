@@ -1,10 +1,12 @@
 com\example\demo\service\INotificationService.class
+com\example\demo\kafka\KafkaConsumerConfig.class
 com\example\demo\configuration\NotificationConfig.class
 com\example\demo\dto\NotificationRequestDto.class
 com\example\demo\repository\NotificationRepository.class
 com\example\demo\dto\NotificationRequestDto$NotificationRequestDtoBuilder.class
 com\example\demo\entity\Notification.class
 com\example\demo\enumerate\NotificationType.class
+com\example\demo\kafka\KafkaConsumerService.class
 com\example\demo\web\NotificationController.class
 com\example\demo\entity\Notification$NotificationBuilder.class
 com\example\demo\dto\NotificationResponseDto.class

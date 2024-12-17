@@ -1,192 +1,262 @@
 version: '3.8'
 
 services:
-  # Base de données pour user-service
-  postgres-user-db:
-    image: postgres:13
+  # =====================
+  # Bases de données
+  # =====================
+  
+  # PostgreSQL pour User Service
+  user-db:
+    image: postgres:17
+    container_name: user-db
     environment:
-      POSTGRES_USER: userdbuser
-      POSTGRES_PASSWORD: userdbpassword
-      POSTGRES_DB: userdb
+      POSTGRES_DB: user_service_db
+      POSTGRES_USER: user_admin
+      POSTGRES_PASSWORD: user_password
     ports:
-      - "5432:5432"
+      - "5439:5432"
     volumes:
-      - user-db-data:/var/lib/postgresql/data
+      - user-data:/var/lib/postgresql/data
 
-  # Base de données pour account-service
-  postgres-account-db:
-    image: postgres:13
+  # PostgreSQL pour Account Service
+  account-db:
+    image: postgres:17
+    container_name: account-db
     environment:
-      POSTGRES_USER: accountdbuser
-      POSTGRES_PASSWORD: accountdbpassword
-      POSTGRES_DB: accountdb
+      POSTGRES_DB: account_service_db
+      POSTGRES_USER: account_admin
+      POSTGRES_PASSWORD: account_password
     ports:
-      - "5433:5432"
+      - "5438:5432"
     volumes:
-      - account-db-data:/var/lib/postgresql/data
+      - account-data:/var/lib/postgresql/data
 
-  # Base de données pour loan-service
-  postgres-loan-db:
-    image: postgres:13
+  # PostgreSQL pour Notification Service
+  notification-db:
+    image: postgres:17
+    container_name: notification-db
     environment:
-      POSTGRES_USER: loandbuser
-      POSTGRES_PASSWORD: loandbpassword
-      POSTGRES_DB: loandb
+      POSTGRES_DB: notification_service_db
+      POSTGRES_USER: notification_admin
+      POSTGRES_PASSWORD: notification_password
     ports:
       - "5434:5432"
     volumes:
-      - loan-db-data:/var/lib/postgresql/data
+      - notification-data:/var/lib/postgresql/data
 
-  # Base de données pour transaction-service
-  postgres-transaction-db:
-    image: postgres:13
+  # PostgreSQL pour Transaction Service
+  transaction-db:
+    image: postgres:17
+    container_name: transaction-db
     environment:
-      POSTGRES_USER: transactiondbuser
-      POSTGRES_PASSWORD: transactiondbpassword
-      POSTGRES_DB: transactiondb
+      POSTGRES_DB: transaction_service_db
+      POSTGRES_USER: transaction_admin
+      POSTGRES_PASSWORD: transaction_password
     ports:
-      - "5437:5432"
+      - "5435:5432"
     volumes:
-      - transaction-db-data:/var/lib/postgresql/data
+      - transaction-data:/var/lib/postgresql/data
 
-  # Base de données pour notification-service
-  postgres-notification-db:
-    image: postgres:13
+  # PostgreSQL pour Loan Service
+  loan-db:
+    image: postgres:17
+    container_name: loan-db
     environment:
-      POSTGRES_USER: notificationdbuser
-      POSTGRES_PASSWORD: notificationdbpassword
-      POSTGRES_DB: notificationdb
+      POSTGRES_DB: loan_service_db
+      POSTGRES_USER: loan_admin
+      POSTGRES_PASSWORD: loan_password
     ports:
       - "5436:5432"
     volumes:
-      - notification-db-data:/var/lib/postgresql/data
-  
-  my-discovery-service:
-    build: ./discovery-service
-    container_name: my-discovery-service
-    ports:
-      - '8761:8761'
-    expose:
-      - '8761'
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
-      interval: 10s
-      retries: 4
-      
-  my-config-service:
-    build: ./config-service
-    container_name: my-config-service
-    ports:
-      - '9911:9911'
-    expose:
-      - '9911'
-    environment:
-      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9911/actuator/health" ]
-      interval: 10s
-      retries: 4
-    depends_on:
-      my-discovery-service:
-        condition: service_healthy
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+      - loan-data:/var/lib/postgresql/data
 
-  kafka:
-    image: confluentinc/cp-kafka:7.0.1
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
+  # =====================
+  # Services d'infrastructure
+  # =====================
+
+  # Discovery Service (Eureka)
+  discovery-service:
+    image: openjdk:17-jdk-slim
+    container_name: discovery-service
+    build: ./discovery-service
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      - SPRING_APPLICATION_NAME=discovery-service
+      - SERVER_PORT=8761
+    ports:
+      - "8761:8761"
+    volumes:
+      - ./discovery-service/target:/app  # Assurez-vous que c'est le bon chemin
+    working_dir: /app
+    command: ["java", "-jar", "discovery-service.jar"]
+    networks:
+      - microservices-network
+
+  # Config Service
+  config-service:
+    image: openjdk:17-jdk-slim
+    container_name: config-service
+    environment:
+      - SPRING_APPLICATION_NAME=config-service
+      - SERVER_PORT=8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config-service/target:/app  # Assurez-vous que le fichier JAR est dans le dossier target
+    working_dir: /app
+    command: ["java", "-jar", "config-service.jar"]
+    depends_on:
+      - discovery-service
+    networks:
+      - microservices-network
+
+  # Gateway API
+  gateway-service:
+    image: openjdk:17-jdk-slim
+    container_name: gateway-service
+    environment:
+      - SPRING_APPLICATION_NAME=gateway-service
+      - SERVER_PORT=9999
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+    ports:
+      - "9999:8080"
+    volumes:
+      - ./gateway-service/target:/app
+    working_dir: /app
+    command: ["java", "-jar", "gateway-service.jar"]
+    depends_on:
+      - discovery-service
+      - config-service
+    networks:
+      - microservices-network
+
+  # =====================
+  # Microservices
+  # =====================
+
   # User Service
   user-service:
-    build: ./user-service
+    image: openjdk:17-jdk-slim
+    container_name: user-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user-db:5432/userdb
-      SPRING_DATASOURCE_USERNAME: userdbuser
-      SPRING_DATASOURCE_PASSWORD: userdbpassword
-    depends_on:
-      my-config-service:
-        condition: service_healthy
+      - SPRING_APPLICATION_NAME=user-service
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/user_service_db
+      - SPRING_DATASOURCE_USERNAME=user_admin
+      - SPRING_DATASOURCE_PASSWORD=user_password
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
     ports:
       - "8081:8081"
+    volumes:
+      - ./user-service/target:/app
+    depends_on:
+      - user-db
+      - discovery-service
+      - config-service
+    networks:
+      - microservices-network
 
   # Account Service
   account-service:
-    build: ./account-service
+    image: openjdk:17-jdk-slim
+    container_name: account-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-account-db:5432/accountdb
-      SPRING_DATASOURCE_USERNAME: accountdbuser
-      SPRING_DATASOURCE_PASSWORD: accountdbpassword
-    depends_on:
-      my-config-service:
-        condition: service_healthy
+      - SPRING_APPLICATION_NAME=account-service
+      - SERVER_PORT=8082
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://account-db:5432/account_service_db
+      - SPRING_DATASOURCE_USERNAME=account_admin
+      - SPRING_DATASOURCE_PASSWORD=account_password
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
     ports:
       - "8082:8082"
-
-  # Loan Service
-  loan-service:
-    build: ./loan-service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-loan-db:5432/loandb
-      SPRING_DATASOURCE_USERNAME: loandbuser
-      SPRING_DATASOURCE_PASSWORD: loandbpassword
+    volumes:
+      - ./account-service/target:/app
     depends_on:
-      my-config-service:
-        condition: service_healthy
-    ports:
-      - "8083:8083"
-
-  # Transaction Service
-  transaction-service:
-    build: ./transaction-service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transaction-db:5432/transactiondb
-      SPRING_DATASOURCE_USERNAME: transactiondbuser
-      SPRING_DATASOURCE_PASSWORD: transactiondbpassword
-    depends_on:
-      my-config-service:
-        condition: service_healthy
-    ports:
-      - "8084:8084"
+      - account-db
+      - discovery-service
+      - config-service
+    networks:
+      - microservices-network
 
   # Notification Service
   notification-service:
-    build: ./notification-service
+    image: openjdk:17-jdk-slim
+    container_name: notification-service
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-notification-db:5432/notificationdb
-      SPRING_DATASOURCE_USERNAME: notificationdbuser
-      SPRING_DATASOURCE_PASSWORD: notificationdbpassword
+      - SPRING_APPLICATION_NAME=notification-service
+      - SERVER_PORT=8083
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://notification-db:5432/notification_service_db
+      - SPRING_DATASOURCE_USERNAME=notification_admin
+      - SPRING_DATASOURCE_PASSWORD=notification_password
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./notification-service/target:/app
     depends_on:
-      my-config-service:
-        condition: service_healthy
+      - notification-db
+      - discovery-service
+      - config-service
+    networks:
+      - microservices-network
+
+  # Transaction Service
+  transaction-service:
+    image: openjdk:17-jdk-slim
+    container_name: transaction-service
+    environment:
+      - SPRING_APPLICATION_NAME=transaction-service
+      - SERVER_PORT=8084
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://transaction-db:5432/transaction-service_db
+      - SPRING_DATASOURCE_USERNAME=transaction_admin
+      - SPRING_DATASOURCE_PASSWORD=transaction_password
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./transaction-service/target:/app
+    depends_on:
+      - transaction-db
+      - discovery-service
+      - config-service
+    networks:
+      - microservices-network
+
+  # Loan Service
+  loan-service:
+    image: openjdk:17-jdk-slim
+    container_name: loan-service
+    environment:
+      - SPRING_APPLICATION_NAME=loan-service
+      - SERVER_PORT=8085
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://loan-db:5432/loan-service_db
+      - SPRING_DATASOURCE_USERNAME=loan_admin
+      - SPRING_DATASOURCE_PASSWORD=loan_password
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
     ports:
       - "8085:8085"
-  
-  gateway-service:
-    build: ./gateway-service
-    
+    volumes:
+      - ./loan-service/target:/app
     depends_on:
-      my-config-service:
-        condition: service_healthy
-    ports:
-      - "8888:8888" 
+      - loan-db
+      - discovery-service
+      - config-service
+    networks:
+      - microservices-network
 
-# Définir les volumes à l'extérieur de la section "services"
 volumes:
-  user-db-data:
-  account-db-data:
-  loan-db-data:
-  transaction-db-data:
-  notification-db-data:
-  
+  user-data:
+  account-data:
+  notification-data:
+  transaction-data:
+  loan-data:
+
+networks:
+  microservices-network:
+    driver: bridge

@@ -68,9 +68,9 @@ public class AccountController {
 		return clientRest.getUserById(id);
 	}
 	@GetMapping("/user/{id}")
-	public ResponseEntity<List<AccountDto>> getAccountsByUserId(@PathVariable long id) {
+	public List<AccountDto> getAccountsByUserId(@PathVariable long id) {
 		List<AccountDto> accountDtos=accountService.getAccoutsDtoByUserId(id);
-		return ResponseEntity.ok(accountDtos);
+		return accountDtos;
 	}
 	
 	

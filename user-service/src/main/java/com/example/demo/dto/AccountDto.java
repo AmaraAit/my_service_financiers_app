@@ -12,10 +12,9 @@ import lombok.Setter;
 import lombok.ToString;
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder @ToString
 public class AccountDto {
-	
 	private long accountId;
+	private long userId;
 	private String accountNumber;
-	private String accountType;
 	private BigDecimal balance;
 
 }

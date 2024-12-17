@@ -41,15 +41,24 @@ public class TransactionServiceImpl implements ITransactionService{
 				transaction.setType(transactionRequestDto.getType());
 				transaction.setAmount(transactionRequestDto.getAmount());
 				transaction.setSourceAccountId(transactionRequestDto.getSourceAccountId());
-				transaction.setDestinationAccountId(transactionRequestDto.getDestinationAccountId());
+				
 				transaction.setTransactionDate(LocalDateTime.now());
 				transaction.setStatus(TransactionStatus.PENDING);
 				transactionRepository.save(transaction);
 				
 				if(transactionRequestDto.getType().equals(TransactionType.TRANSFER)) {
 					accountFeignClient.debitAccount(transactionRequestDto.getSourceAccountId(), transactionRequestDto.getAmount());
-				}else {
 					accountFeignClient.creditAccount(transactionRequestDto.getDestinationAccountId(), transactionRequestDto.getAmount());
+					
+				}else if(transactionRequestDto.getType().equals(TransactionType.DEPOSIT)){
+					accountFeignClient.creditAccount(transactionRequestDto.getSourceAccountId(), transactionRequestDto.getAmount());
+					System.out.println(transactionRequestDto.getType());
+				}else if(accountBalance.compareTo(transactionRequestDto.getAmount())<0){
+					return new TransactionResponseDto(1,TransactionStatus.FAILED,"Solde insuffisant ");
+					
+				}else {
+					accountFeignClient.debitAccount(transactionRequestDto.getSourceAccountId(), transactionRequestDto.getAmount());
+					
 				}
 				transaction.setStatus(TransactionStatus.COMPLETED);
 				kafkaProducerService.sendmsg(transaction.getType().toString());
