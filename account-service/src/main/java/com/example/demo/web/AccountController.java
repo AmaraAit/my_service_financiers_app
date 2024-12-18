@@ -6,6 +6,8 @@ import java.util.List;
 import javax.naming.InsufficientResourcesException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +56,12 @@ public class AccountController {
 		return ResponseEntity.ok("Account credited Sucessfully");
 	}
 	
+	@GetMapping("/auth")
+	public Authentication authentication(Authentication authentication) {
+		
+		return authentication;
+	}
+
 	@GetMapping("/{id}")
 	public Account geAccountbyid(@PathVariable long id) {
 		Account account=accountService.getAccountsById(id);

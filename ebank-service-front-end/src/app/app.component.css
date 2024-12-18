@@ -1,0 +1,32 @@
+.navbar {
+    background-color: #007bff; /* Couleur bleue pour un style bancaire */
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+.navbar-brand:hover {
+    color: #e0e0e0;
+}
+
+.nav-link {
+    color: #fff;
+}
+
+.nav-link:hover {
+    color: #cce4ff;
+}
+
+.btn-login {
+    background-color: #28a745;
+    color: white;
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+
+.btn-login:hover {
+    background-color: #218838;
+}

@@ -1,0 +1,67 @@
+<div class="container py-5">
+  <h1 class="text-center mb-4">Données Bancaires</h1>
+
+  <!-- Première ligne de cartes -->
+  <div class="row mb-4">
+    <!-- Carte Informations Personnelles -->
+    <div class="col-md-4" *ngIf="account">
+      <div class="card">
+        <div class="card-header">
+          Informations Personnelles
+        </div>
+        <div class="card-body">
+          <p><strong>Nom :</strong> {{account.userDto.firstName}}{{account.userDto.lastName}}</p>
+          <p><strong>Email :</strong> {{account.userDto.email}}</p>
+          <p><strong>Numéro de Téléphone :</strong> {{account.userDto.phoneNumber}} </p>
+        </div>
+        <div class="card-footer text-center">
+          <button class="btn btn-custom">Modifier</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carte Informations Bancaires -->
+    <div class="col-md-5">
+      <div class="card" *ngIf="account">
+        <div class="card-header">
+          Informations Bancaires
+        </div>
+        <div class="card-body">
+          <p><strong>Numéro de Compte :</strong> {{account.accountNumber}}</p>
+          <p><strong>Type de Compte :</strong> Compte {{account.accountType}}</p>
+          <p><strong>Banque :</strong> Banque Nationale</p>
+        </div>
+        <div class="card-footer text-center">
+          <button class="btn btn-custom">Voir Plus</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carte Solde -->
+    <div class="col-md-3" *ngIf="account">
+      <div class="card">
+        <div class="card-header">
+          Solde Actuel
+        </div>
+        <div class="card-body text-center">
+          <h2 class="text-success">{{account.balance}}€</h2>
+          <p class="text-muted">Dernière mise à jour : 02/12/2024</p>
+        </div>
+        <div class="card-footer text-center">
+          <button class="btn btn-custom">Actualiser</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deuxième ligne de cartes -->
+  <div class="row">
+    <!-- Carte Historique des Transactions -->
+
+
+    <!-- Carte Notifications -->
+
+  </div>
+</div>
+
+
