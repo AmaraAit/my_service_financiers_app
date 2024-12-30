@@ -78,7 +78,11 @@ public class TransactionServiceImpl implements ITransactionService{
 		List<Transaction> transactions=transactionRepository.findBySourceAccountIdOrdestinationAccountId(accountId, accountId);
 		List<TransactionDto> transactionsdto=new ArrayList<>();
 		for (Transaction transaction : transactions) {
-			transactionsdto.add(convertToDto(transaction));
+			TransactionDto dto=convertToDto(transaction);
+			dto.setSourceAccountdto(accountFeignClient.geAccountbyid(dto.getSourceAccountId()));
+			dto.setDestinationAccountdto(accountFeignClient.geAccountbyid(dto.getDestinationAccountId()));
+			transactionsdto.add(dto);
+			
 		}
 		return transactionsdto;
 	}

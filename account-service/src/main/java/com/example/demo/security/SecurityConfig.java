@@ -30,12 +30,12 @@ public class SecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity
 				.cors(Customizer.withDefaults())
-				.sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				//.sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.csrf(csrf->csrf.disable())
 				.headers(h->h.frameOptions(fo->fo.disable()))
-				.authorizeHttpRequests(ar->ar.requestMatchers("/").permitAll())
+				.authorizeHttpRequests(ar->ar.requestMatchers("/**").permitAll())
 				//.authorizeHttpRequests(ar->ar.requestMatchers("/accounts/**").hasAuthority("ADMIN"))
-				.authorizeHttpRequests(ar->ar.anyRequest().authenticated())
+				//.authorizeHttpRequests(ar->ar.anyRequest().authenticated())
 				.oauth2ResourceServer(o2->o2.jwt(jwt->jwt.jwtAuthenticationConverter(jwtAuthConverter)))
 				.build();
 		

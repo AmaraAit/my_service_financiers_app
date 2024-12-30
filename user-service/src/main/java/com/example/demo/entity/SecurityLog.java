@@ -26,5 +26,5 @@ public class SecurityLog {
 	private LocalDateTime eventDate;
 	@ManyToOne
 	@JoinColumn(name = "client_id")
-	private Client client;
+	private User client;
 }
