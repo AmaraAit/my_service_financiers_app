@@ -68,7 +68,7 @@ public class UserServiceImpl implements IUserService,UserDetailsService{
 	}
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user =userRepository.findByEmail(username).get();
+		User user =userRepository.findByEmail(username).orElseThrow(()->new UserNotFoundException("User not found with  email:"+username) );
 		Collection<GrantedAuthority> authorities=new ArrayList<>();
 		user.getRole().forEach(auth->{
 			authorities.add(new SimpleGrantedAuthority(auth.getName()));

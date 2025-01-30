@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web.Client;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,8 +48,15 @@ public class UserController {
 	 private PasswordEncoder passwordEncoder;
 	 
 	 @GetMapping("/{id}")
+	 @PreAuthorize("hasAuthority('SCOPE_USER')")
 	 public User getUser(@PathVariable long id) {
 		return iUserService.getById(id);
+		 
+	 }
+	 @GetMapping("/email/{email}")
+	 @PreAuthorize("hasAuthority('SCOPE_USER')")
+	 public User getUserbyemail(@PathVariable String email) {
+		return iUserService.getByEmail(email);
 		 
 	 }
 	 @GetMapping
@@ -62,7 +70,7 @@ public class UserController {
 	    public User authenticateUser(@RequestBody LoginDto loginDto){
 	        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 	                loginDto.getUsername(), loginDto.getPassword()));
-
+	        System.out.println("amarahbsdddddddddddddddddd");
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
 	        return iUserService.getByEmail(loginDto.getUsername());
 	    }
@@ -99,6 +107,7 @@ public class UserController {
 		 
 	 }
 	 @GetMapping("/all")
+	 @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
 	 public List<User> getUsers(){
 		return iUserService.getUsers();
 	 }

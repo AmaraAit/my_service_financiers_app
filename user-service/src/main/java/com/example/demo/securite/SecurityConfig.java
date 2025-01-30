@@ -24,8 +24,7 @@ import com.example.demo.service.UserServiceImpl;
 import lombok.AllArgsConstructor;
 
 
-@Configuration
-@EnableMethodSecurity
+
 public class SecurityConfig {
 	
 	@Bean
@@ -37,16 +36,14 @@ public class SecurityConfig {
 	      .and()
 	      .build();
 	}
-	@Bean
+	//@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		 http
 		 .csrf(csrf -> csrf.disable())
-		 .cors()
-         .and()
-         .csrf().disable()
-		         .authorizeHttpRequests((authorize) -> {
-		             authorize.requestMatchers("/admin/**").hasAuthority("ADMIN");
-		             authorize.requestMatchers("/user/**").hasAnyAuthority("USER", "ADMIN");
+		 .cors(Customizer.withDefaults())
+         .authorizeHttpRequests((authorize) -> {
+		             authorize.requestMatchers("/**").hasAuthority("USER");
+		             authorize.requestMatchers("/admin/**").hasAnyAuthority("USER", "ADMIN");
 		             authorize.requestMatchers("/login").permitAll();
 		             authorize.anyRequest().authenticated();
 		         }).formLogin(Customizer.withDefaults());
