@@ -7,6 +7,8 @@ C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\exception\GlobalHandlerException.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\externe\UserClientRest.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\repository\AccountRepository.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\security\JwtAuthConverter.java
+C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\security\SecurityConfig.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\service\AccountServiceImpl.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\service\IAccountService.java
 C:\Users\Ait_A\eclipse-workspace\gestion-services-financier\account-service\src\main\java\com\example\demo\web\AccountController.java

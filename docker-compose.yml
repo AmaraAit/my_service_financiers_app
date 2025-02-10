@@ -31,45 +31,7 @@ services:
     volumes:
       - account-data:/var/lib/postgresql/data
 
-  # PostgreSQL pour Notification Service
-  notification-db:
-    image: postgres:17
-    container_name: notification-db
-    environment:
-      POSTGRES_DB: notification_service_db
-      POSTGRES_USER: notification_admin
-      POSTGRES_PASSWORD: notification_password
-    ports:
-      - "5434:5432"
-    volumes:
-      - notification-data:/var/lib/postgresql/data
-
-  # PostgreSQL pour Transaction Service
-  transaction-db:
-    image: postgres:17
-    container_name: transaction-db
-    environment:
-      POSTGRES_DB: transaction_service_db
-      POSTGRES_USER: transaction_admin
-      POSTGRES_PASSWORD: transaction_password
-    ports:
-      - "5435:5432"
-    volumes:
-      - transaction-data:/var/lib/postgresql/data
-
-  # PostgreSQL pour Loan Service
-  loan-db:
-    image: postgres:17
-    container_name: loan-db
-    environment:
-      POSTGRES_DB: loan_service_db
-      POSTGRES_USER: loan_admin
-      POSTGRES_PASSWORD: loan_password
-    ports:
-      - "5436:5432"
-    volumes:
-      - loan-data:/var/lib/postgresql/data
-
+  
   # =====================
   # Services d'infrastructure
   # =====================
@@ -85,8 +47,8 @@ services:
     ports:
       - "8761:8761"
     volumes:
-      - ./discovery-service/target:/app  # Assurez-vous que c'est le bon chemin
-    working_dir: /app
+      - ./discovery-service/target:/tmp  # Assurez-vous que c'est le bon chemin
+    working_dir: /tmp
     command: ["java", "-jar", "discovery-service.jar"]
     networks:
       - microservices-network
@@ -102,8 +64,8 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ./config-service/target:/app  # Assurez-vous que le fichier JAR est dans le dossier target
-    working_dir: /app
+      - ./config-service/target:/tmp  # Assurez-vous que le fichier JAR est dans le dossier target
+    working_dir: /tmp
     command: ["java", "-jar", "config-service.jar"]
     depends_on:
       - discovery-service
@@ -122,7 +84,7 @@ services:
     ports:
       - "9999:8080"
     volumes:
-      - ./gateway-service/target:/app
+      - ./gateway-service/target:/tmp
     working_dir: /app
     command: ["java", "-jar", "gateway-service.jar"]
     depends_on:
@@ -150,7 +112,7 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./user-service/target:/app
+      - ./user-service/target:/tmp
     depends_on:
       - user-db
       - discovery-service
@@ -173,7 +135,7 @@ services:
     ports:
       - "8082:8082"
     volumes:
-      - ./account-service/target:/app
+      - ./account-service/target:/tmp
     depends_on:
       - account-db
       - discovery-service
@@ -181,81 +143,10 @@ services:
     networks:
       - microservices-network
 
-  # Notification Service
-  notification-service:
-    image: openjdk:17-jdk-slim
-    container_name: notification-service
-    environment:
-      - SPRING_APPLICATION_NAME=notification-service
-      - SERVER_PORT=8083
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://notification-db:5432/notification_service_db
-      - SPRING_DATASOURCE_USERNAME=notification_admin
-      - SPRING_DATASOURCE_PASSWORD=notification_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
-    ports:
-      - "8083:8083"
-    volumes:
-      - ./notification-service/target:/app
-    depends_on:
-      - notification-db
-      - discovery-service
-      - config-service
-    networks:
-      - microservices-network
-
-  # Transaction Service
-  transaction-service:
-    image: openjdk:17-jdk-slim
-    container_name: transaction-service
-    environment:
-      - SPRING_APPLICATION_NAME=transaction-service
-      - SERVER_PORT=8084
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://transaction-db:5432/transaction-service_db
-      - SPRING_DATASOURCE_USERNAME=transaction_admin
-      - SPRING_DATASOURCE_PASSWORD=transaction_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
-    ports:
-      - "8084:8084"
-    volumes:
-      - ./transaction-service/target:/app
-    depends_on:
-      - transaction-db
-      - discovery-service
-      - config-service
-    networks:
-      - microservices-network
-
-  # Loan Service
-  loan-service:
-    image: openjdk:17-jdk-slim
-    container_name: loan-service
-    environment:
-      - SPRING_APPLICATION_NAME=loan-service
-      - SERVER_PORT=8085
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://loan-db:5432/loan-service_db
-      - SPRING_DATASOURCE_USERNAME=loan_admin
-      - SPRING_DATASOURCE_PASSWORD=loan_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
-    ports:
-      - "8085:8085"
-    volumes:
-      - ./loan-service/target:/app
-    depends_on:
-      - loan-db
-      - discovery-service
-      - config-service
-    networks:
-      - microservices-network
 
 volumes:
   user-data:
   account-data:
-  notification-data:
-  transaction-data:
-  loan-data:
 
 networks:
   microservices-network:
