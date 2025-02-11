@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # =====================
   # Bases de données
@@ -15,8 +13,13 @@ services:
       POSTGRES_PASSWORD: user_password
     ports:
       - "5439:5432"
-    volumes:
-      - user-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    #volumes:
+      #- user-data:/var/lib/postgresql/data
 
   # PostgreSQL pour Account Service
   account-db:
@@ -28,126 +31,215 @@ services:
       POSTGRES_PASSWORD: account_password
     ports:
       - "5438:5432"
-    volumes:
-      - account-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U account_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
+  notification-db:
+    image: postgres:17
+    container_name: notification-db
+    environment:
+      POSTGRES_DB: notification_service_db
+      POSTGRES_USER: notification_admin
+      POSTGRES_PASSWORD: notification_password
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notification_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL pour Transaction Service
+  transaction-db:
+    image: postgres:17
+    container_name: transaction-db
+    environment:
+      POSTGRES_DB: transaction_service_db
+      POSTGRES_USER: transaction_admin
+      POSTGRES_PASSWORD: transaction_password
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U transaction_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL pour Loan Service
+  loan-db:
+    image: postgres:17
+    container_name: loan-db
+    environment:
+      POSTGRES_DB: loan_service_db
+      POSTGRES_USER: loan_admin
+      POSTGRES_PASSWORD: loan_password
+    ports:
+      - "5436:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U loan_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   
-  # =====================
-  # Services d'infrastructure
-  # =====================
-
-  # Discovery Service (Eureka)
-  discovery-service:
-    image: openjdk:17-jdk-slim
-    container_name: discovery-service
+  enset-ebank-discovery-service:
     build: ./discovery-service
-    environment:
-      - SPRING_APPLICATION_NAME=discovery-service
-      - SERVER_PORT=8761
+    container_name: enset-ebank-discovery-service
     ports:
-      - "8761:8761"
-    volumes:
-      - ./discovery-service/target:/tmp  # Assurez-vous que c'est le bon chemin
-    working_dir: /tmp
-    command: ["java", "-jar", "discovery-service.jar"]
-    networks:
-      - microservices-network
-
-  # Config Service
-  config-service:
-    image: openjdk:17-jdk-slim
-    container_name: config-service
-    environment:
-      - SPRING_APPLICATION_NAME=config-service
-      - SERVER_PORT=8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+      - '8761:8761'
+    expose:
+      - '8761'
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      retries: 4
+  enset-ebank-config-service:
+    build: ./config-service
+    container_name: enset-ebank-config-service
     ports:
-      - "8888:8888"
-    volumes:
-      - ./config-service/target:/tmp  # Assurez-vous que le fichier JAR est dans le dossier target
-    working_dir: /tmp
-    command: ["java", "-jar", "config-service.jar"]
+      - '9999:9999'
+    expose:
+      - '9999'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://enset-ebank-discovery-service:8761/eureka
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      retries: 4
     depends_on:
-      - discovery-service
-    networks:
-      - microservices-network
-
-  # Gateway API
-  gateway-service:
-    image: openjdk:17-jdk-slim
-    container_name: gateway-service
-    environment:
-      - SPRING_APPLICATION_NAME=gateway-service
-      - SERVER_PORT=9999
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+      enset-ebank-discovery-service:
+        condition: service_healthy
+  enset-user-service:
+    build: ./user-service
+    container_name: enset-user-service
     ports:
-      - "9999:8080"
-    volumes:
-      - ./gateway-service/target:/tmp
-    working_dir: /app
-    command: ["java", "-jar", "gateway-service.jar"]
-    depends_on:
-      - discovery-service
-      - config-service
-    networks:
-      - microservices-network
-
-  # =====================
-  # Microservices
-  # =====================
-
-  # User Service
-  user-service:
-    image: openjdk:17-jdk-slim
-    container_name: user-service
+      - '8081:8081'
+    expose:
+      - '8081'
     environment:
-      - SPRING_APPLICATION_NAME=user-service
-      - SERVER_PORT=8081
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/user_service_db
-      - SPRING_DATASOURCE_USERNAME=user_admin
-      - SPRING_DATASOURCE_PASSWORD=user_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./user-service/target:/tmp
+      - DISCOVERY_SERVICE_URL=http://enset-ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:8888
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
-      - user-db
-      - discovery-service
-      - config-service
-    networks:
-      - microservices-network
-
-  # Account Service
-  account-service:
-    image: openjdk:17-jdk-slim
-    container_name: account-service
+      user-db:
+        condition: service_healthy
+      enset-ebank-config-service:
+        condition: service_healthy
+  enset-account-service:
+    build: ./account-service
+    container_name: enset-account-service
+    ports:
+      - '8082:8082'
+    expose:
+      - '8082'
     environment:
-      - SPRING_APPLICATION_NAME=account-service
-      - SERVER_PORT=8082
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://account-db:5432/account_service_db
-      - SPRING_DATASOURCE_USERNAME=account_admin
-      - SPRING_DATASOURCE_PASSWORD=account_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
-    ports:
-      - "8082:8082"
-    volumes:
-      - ./account-service/target:/tmp
+      - DISCOVERY_SERVICE_URL=http://enset-ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:8888
     depends_on:
-      - account-db
-      - discovery-service
-      - config-service
-    networks:
-      - microservices-network
+      account-db:
+        condition: service_healthy
+      enset-ebank-config-service:
+        condition: service_healthy
+  enset-gateway-service:
+    build: ./gateway-service
+    container_name: enset-gateway-service
+    ports:
+      - '8088:8088'
+    expose:
+      - '8088'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://enset-ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:8888
+    depends_on:
+      enset-ebank-config-service:
+        condition: service_healthy
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  
+  notification-service:
+    image: openjdk:17-jdk-slim
+    container_name: notification-service
+    environment:
+      - DISCOVERY_SERVICE_URL=http://enset-ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:8888
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8083/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      notification-db:
+        condition: service_healthy
+      enset-ebank-config-service:
+        condition: service_healthy
 
 
-volumes:
-  user-data:
-  account-data:
+  # Transaction Service
+  transaction-service:
+    image: openjdk:17-jdk-slim
+    container_name: transaction-service
+    environment:
+      - DISCOVERY_SERVICE_URL=http://enset-ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:8888
+    ports:
+      - "8084:8084"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8084/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      transaction-db:
+        condition: service_healthy
+      enset-ebank-config-service:
+        condition: service_healthy
 
-networks:
-  microservices-network:
-    driver: bridge
+
+  # Loan Service
+  loan-service:
+    image: openjdk:17-jdk-slim
+    container_name: loan-service
+    environment:
+      - DISCOVERY_SERVICE_URL=http://enset-ebank-discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:8888
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8085/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      loan-db:
+        condition: service_healthy
+      enset-ebank-config-service:
+        condition: service_healthy

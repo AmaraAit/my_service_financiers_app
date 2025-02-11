@@ -69,7 +69,7 @@ public class SecurityConfigV2 {
 				.sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.csrf(csrf->csrf.disable())
 				.headers(h->h.frameOptions(fo->fo.disable()))
-				.authorizeHttpRequests(ar->ar.requestMatchers("/auth/**").permitAll())
+				.authorizeHttpRequests(ar->ar.requestMatchers("/auth/**","/actuator/health").permitAll())
 				//.authorizeHttpRequests(ar->ar.requestMatchers("/accounts/**").hasAuthority("ADMIN"))
 				.authorizeHttpRequests(ar->ar.anyRequest().authenticated())
 				.oauth2ResourceServer(o2->o2.jwt(Customizer.withDefaults()))
